@@ -24,19 +24,27 @@ learnjs.temlate = function(name){
     return $('.templates .' + name).clone();
 }
 
+learnjs.landingView = function(){
+    return learnjs.temlate('landing-view');
+}
+
 learnjs.problemView = function(data){
     var problemNumber = parseInt(data, 10);
     var view = learnjs.temlate('problem-view');
     var problemData = learnjs.problems[problemNumber - 1];
     var resultFlash = view.find('.result');
-
+    
     function checkAnswer(){
         var answer = view.find('.answer').val();
         var test = problemData.code.replace('__', answer) + '; problem();';
-        //console.log(answer);
-        //console.log(test);
-
         return eval(test);
+    }
+
+    learnjs.flashElement = function(elem, content){
+        elem.fadeOut('fast', function(){
+            elem.html(content);
+            elem.fadeIn();
+        });
     }
 
     function checkAnswerClick(){
@@ -66,18 +74,11 @@ learnjs.buildCorrectFlash = function(problemNum){
     return correctFlash;
 }
 
-
-learnjs.flashElement = function(elem, content){
-    elem.fadeOut('fast', function(){
-        elem.html(content);
-        elem.fadeIn();
-    });
-}
-
-
 learnjs.showView = function(hash){
     var routes = {
-        '#problem': learnjs.problemView
+        '#problem': learnjs.problemView,
+        '#': learnjs.landingView,
+        '': learnjs.landingView
     };
     var hashParts = hash.split('-');
     var viewFn = routes[hashParts[0]]; //problemviewを作成
@@ -92,4 +93,8 @@ learnjs.appOnReady = function(){
         learnjs.showView(window.location.hash);
     };
     learnjs.showView(window.location.hash);
+}
+
+learnjs.triggerEvent = function(name, args){
+    $('.view-container>*').trigger(name, args);
 }
